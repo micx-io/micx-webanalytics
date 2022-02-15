@@ -10,11 +10,11 @@ AppLoader::extend(function (BraceApp $app) {
 
 
     $app->command->addCommand("send", function(array $argv) {
-        //$runner = new FileStatsRunner();
-        //$runner->runAll($argv[0] ?? 0);
+        $runner = new FileStatsRunner();
+        $runner->runAll($argv[0] ?? 0);
     });
 
-    // Send yesterdays report (specified by 1)
+    // Send yesterdays report at 00:05:00 (specified by 1)
     $app->command->addInterval("5 0 * * *", "send", [1], true);
 
 });
