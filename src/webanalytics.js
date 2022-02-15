@@ -24,7 +24,8 @@
       "visitor_id_gmdate": server_date,
       "visitor_id": rand_id,
       "visitor_seq": 0,
-      "visits": 0
+      "visits": 0,
+      "last_visit_gmdate": server_date
     }
   } else {
     lsd = JSON.parse(lsd);
@@ -36,10 +37,11 @@
     ssd = {
       "session_id_gmdate": server_date,
       "session_id": rand_id,
-      "session_seq": 0
+      "session_seq": 0,
     }
     lsd.visits++;
   } else {
+    lsd.last_visit_gmdate = server_date;
     ssd = JSON.parse(ssd);
   }
   ssd.session_seq++;
