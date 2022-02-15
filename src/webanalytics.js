@@ -20,6 +20,7 @@
 
 
     let data = {
+      href: window.location.href,
       user_agent: window.navigator.userAgent,
       language: window.navigator.language,
       screen: screen.height + "x" + screen.width,

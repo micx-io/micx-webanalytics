@@ -53,8 +53,8 @@ AppLoader::extend(function (BraceApp $app) {
         $mailer->send(file_get_contents(__DIR__ ."/../src/mail.txt"), [
             "email" => $config->report_email,
             "referer" => $request->getHeader("Referer")[0] ?? "unset",
-            "ip" => $request->getServerParams()["REMOTE_ADDR"],
-            "host" => gethostbyaddr($request->getServerParams()["REMOTE_ADDR"]),
+            "ip" => $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip",
+            "host" => gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"),
             "data" => yaml_emit($data)
         ]);
 
