@@ -2,7 +2,7 @@
 /**
  * Micx.io WebAnalytics
  *
- * Usage: See https://github.com/micx-io/micx-formmailer
+ * Usage: See https://github.com/micx-io/micx-webanalytics
  *
  * @licence MIT
  * @author Matthias Leuffen <m@tth.es>
@@ -20,7 +20,7 @@
 
   let lsd = localStorage.getItem("MICX_ANALYTICS_" + subscription_id);
   if (lsd === null) {
-    let lsd = {
+    lsd = {
       "visitor_id_gmdate": server_date,
       "visitor_id": rand_id,
       "visitor_seq": 0
