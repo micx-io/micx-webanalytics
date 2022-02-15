@@ -51,7 +51,14 @@ AppLoader::extend(function (BraceApp $app) {
     $app->router->on("POST@/analytics/emit", function(string $body, Config $config, ServerRequest $request) use ($app) {
         $mailer = new PhoreMailer();
 
+        $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id);
+
         $data = json_decode($body, true);
+
+        if (is_array($data)) {
+            $data["ts"] = time();
+            $logfile->append_content(json_encode($data) . "\n");
+        }
 
 
         $response = new JsonResponse(["ok"]);

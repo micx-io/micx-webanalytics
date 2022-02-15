@@ -12,6 +12,7 @@ command:
   build:
     - "composer update"
     - "sudo mkdir /data && sudo chmod 777 /data"
+    - "sudo mkdir /config && sudo chmod 777 /config"
 
 
   run:
