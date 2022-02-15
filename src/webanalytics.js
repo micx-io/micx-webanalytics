@@ -25,9 +25,11 @@
       "visitor_id": rand_id,
       "visitor_seq": 0
     }
+  } else {
+    lsd = JSON.parse(lsd);
   }
   lsd.visitor_seq++;
-  localStorage.setItem("MICX_ANALYTICS_" + subscription_id, lsd);
+  localStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(lsd));
 
   let ssd = sessionStorage.getItem("MICX_ANALYTICS_" + subscription_id);
   if (ssd === null) {
@@ -36,9 +38,11 @@
       "session_id": rand_id,
       "session_seq": 0
     }
+  } else {
+    ssd = JSON.parse(ssd);
   }
   ssd.session_seq++;
-  sessionStorage.setItem("MICX_ANALYTICS_" + subscription_id, ssd);
+  sessionStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(ssd));
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== 'hidden')
