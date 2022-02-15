@@ -5,6 +5,7 @@ namespace App;
 
 use Brace\Core\AppLoader;
 use Brace\Core\BraceApp;
+use Brace\Core\Helper\Cookie;
 use http\Message\Body;
 use Lack\OidServer\Base\Ctrl\AuthorizeCtrl;
 use Lack\OidServer\Base\Ctrl\SignInCtrl;
@@ -12,6 +13,7 @@ use Lack\OidServer\Base\Ctrl\LogoutCtrl;
 use Lack\OidServer\Base\Ctrl\TokenCtrl;
 use Lack\OidServer\Base\Tpl\HtmlTemplate;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\Response\TextResponse;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequest;
@@ -44,14 +46,27 @@ AppLoader::extend(function (BraceApp $app) {
         return $app->responseFactory->createResponseWithBody($data, 200, ["Content-Type" => "application/javascript"]);
     });
 
-    $app->router->on("POST@/analytics/emit", function(string $body, Config $config, ServerRequest $request) {
+    $app->router->on("POST@/analytics/emit", function(string $body, Config $config, ServerRequest $request) use ($app) {
         $mailer = new PhoreMailer();
 
         $data = json_decode($body, true);
 
+
+        $response = new JsonResponse(["ok"]);
+
+
+        $msid = $request->getCookieParams()["msid"] ?? null;
+        if($msid === null || strlen($msid) !== 6) {
+            $msid = phore_random_str(6);
+            Cookie::setCookie($response, "msid", $msid);
+        }
+
+
+
         $mailer->setSmtpDirectConnect("webanalytics.micx.io");
         $mailer->send(file_get_contents(__DIR__ ."/../src/mail.txt"), [
             "email" => $config->report_email,
+            "msid" => $msid,
             "referer" => $request->getHeader("Referer")[0] ?? "unset",
             "ip" => $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip",
             "host" => gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"),
@@ -59,7 +74,9 @@ AppLoader::extend(function (BraceApp $app) {
             "data" => yaml_emit($data)
         ]);
 
-        return ["ok"];
+
+
+        return $response;
     });
 
 
