@@ -48,7 +48,7 @@ AppLoader::extend(function (BraceApp $app) {
         );
 
         $response = $app->responseFactory->createResponseWithBody($jsText, 200, ["Content-Type" => "application/javascript"]);
-        Cookie::setCookie($response, "MSID", $msId);
+        $response = Cookie::setCookie($response, "MSID", $msId);
         return $response;
     });
 
