@@ -14,6 +14,7 @@
     "ext-openssl": "*",
     "brace/core": "*",
     "brace/dbg": "*",
+    "brace/command": "*",
     "brace/mod-session": "*",
     "brace/mod-cors": "*",
     "brace/mod-body": "*",

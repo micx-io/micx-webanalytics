@@ -57,25 +57,14 @@ AppLoader::extend(function (BraceApp $app) {
 
         if (is_array($data)) {
             $data["ts"] = time();
+            $data["ip"] = $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip";
+            $data["host"] = gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1");
+            $data["referer"] = $request->getHeader("Referer")[0] ?? "unset";
             $logfile->append_content(json_encode($data) . "\n");
         }
 
 
         $response = new JsonResponse(["ok"]);
-
-        $mailer->setSmtpDirectConnect("webanalytics.micx.io");
-        $mailer->send(file_get_contents(__DIR__ ."/../src/mail.txt"), [
-            "email" => $config->report_email,
-            "session_id" => substr($data["session_id"], 0, 6),
-            "referer" => $request->getHeader("Referer")[0] ?? "unset",
-            "ip" => $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip",
-            "host" => gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"),
-            "href" => $data["href"] ?? "*undefined href*",
-            "data" => yaml_emit($data)
-        ]);
-
-
-
         return $response;
     });
 
