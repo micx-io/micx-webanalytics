@@ -59,7 +59,7 @@ AppLoader::extend(function (BraceApp $app) {
         $mailer->setSmtpDirectConnect("webanalytics.micx.io");
         $mailer->send(file_get_contents(__DIR__ ."/../src/mail.txt"), [
             "email" => $config->report_email,
-            "session_id" => $data["session_id"] ?? '000000',
+            "session_id" => substr($data["session_id"], 0, 6),
             "referer" => $request->getHeader("Referer")[0] ?? "unset",
             "ip" => $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip",
             "host" => gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"),
