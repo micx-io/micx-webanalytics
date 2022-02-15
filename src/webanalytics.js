@@ -11,6 +11,7 @@
 
 (()=>{
   let endpoint_url="%%ENDPOINT_URL%%";
+  let session_id="%%SESSION_ID%%";
   let startTime = +new Date();
 
 
@@ -20,6 +21,7 @@
 
 
     let data = {
+      session_id: session_id,
       href: window.location.href,
       user_agent: window.navigator.userAgent,
       language: window.navigator.language,

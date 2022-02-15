@@ -25,25 +25,31 @@ AppLoader::extend(function (BraceApp $app) {
 
 
     $app->router->on("GET@/webanalytics.js", function (BraceApp $app, string $subscriptionId, Config $config, ServerRequestInterface $request) {
-        $data = file_get_contents(__DIR__ . "/../src/webanalytics.js");
 
-        $error = "";
+        $msId = $request->getCookieParams()["MSID"] ?? null;
+        if($msId === null || strlen($msId) !== 6) {
+            $msId = phore_random_str(6);
+        }
+
         $origin = $request->getHeader("referer")[0] ?? null;
-        if ($origin !== null && ! in_array(substr($origin, 0, -1), $config->allow_origins)) {
+        if ($origin !== null && ! in_array(substr($origin, 0, -1), $config->allow_origins, true)) {
             $origin = substr($origin, 0, -1);
             $error = "Invalid origin: '$origin' - not allowed for subscription_id '$subscriptionId'";
         }
 
-        $data = str_replace(
-            ["%%ENDPOINT_URL%%", "%%ERROR%%"],
+        $jsText = file_get_contents(__DIR__ . "/../src/webanalytics.js");
+        $jsText = str_replace(
+            ["%%ENDPOINT_URL%%", "%%SESSION_ID%%"],
             [
                 "//" . $app->request->getUri()->getHost() . "/analytics/emit?subscription_id=$subscriptionId",
-                $error
+                $msId
             ],
-            $data
+            $jsText
         );
 
-        return $app->responseFactory->createResponseWithBody($data, 200, ["Content-Type" => "application/javascript"]);
+        $response = $app->responseFactory->createResponseWithBody($jsText, 200, ["Content-Type" => "application/javascript"]);
+        Cookie::setCookie($response, "MSID", $msId);
+        return $response;
     });
 
     $app->router->on("POST@/analytics/emit", function(string $body, Config $config, ServerRequest $request) use ($app) {
@@ -54,19 +60,10 @@ AppLoader::extend(function (BraceApp $app) {
 
         $response = new JsonResponse(["ok"]);
 
-
-        $msid = $request->getCookieParams()["msid"] ?? null;
-        if($msid === null || strlen($msid) !== 6) {
-            $msid = phore_random_str(6);
-            Cookie::setCookie($response, "msid", $msid);
-        }
-
-
-
         $mailer->setSmtpDirectConnect("webanalytics.micx.io");
         $mailer->send(file_get_contents(__DIR__ ."/../src/mail.txt"), [
             "email" => $config->report_email,
-            "msid" => $msid,
+            "session_id" => $data["session_id"] ?? '000000',
             "referer" => $request->getHeader("Referer")[0] ?? "unset",
             "ip" => $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip",
             "host" => gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"),
