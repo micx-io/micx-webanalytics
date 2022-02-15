@@ -11,17 +11,43 @@
 
 (()=>{
   let endpoint_url="%%ENDPOINT_URL%%";
-  let session_id="%%SESSION_ID%%";
+  let rand_id="%%RAND%%";
+  let server_date="%%SERVER_DATE%%";
+  let subscription_id = "%%SUBSCRIPTION_ID%%"
+
   let startTime = +new Date();
   let wakeups = 0;
+
+  let lsd = localStorage.getItem("MICX_ANALYTICS_" + subscription_id);
+  if (lsd === null) {
+    let lsd = {
+      "visitor_id_gmdate": server_date,
+      "visitor_id": rand_id,
+      "visitor_seq": 0
+    }
+  }
+  lsd.visitor_seq++;
+  localStorage.setItem("MICX_ANALYTICS_" + subscription_id, lsd);
+
+  let ssd = sessionStorage.getItem("MICX_ANALYTICS_" + subscription_id);
+  if (ssd === null) {
+    ssd = {
+      "session_id_gmdate": server_date,
+      "session_id": rand_id,
+      "session_seq": 0
+    }
+  }
+  ssd.session_seq++;
+  sessionStorage.setItem("MICX_ANALYTICS_" + subscription_id, ssd);
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== 'hidden')
       return;
 
-
     let data = {
-      session_id: session_id,
+      ...lsd,
+      ...ssd,
+
       href: window.location.href,
       user_agent: window.navigator.userAgent,
       language: window.navigator.language,

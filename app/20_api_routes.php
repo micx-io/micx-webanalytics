@@ -26,11 +26,6 @@ AppLoader::extend(function (BraceApp $app) {
 
     $app->router->on("GET@/webanalytics.js", function (BraceApp $app, string $subscriptionId, Config $config, ServerRequestInterface $request) {
 
-        $msId = $request->getCookieParams()["MSID"] ?? null;
-        if($msId === null || strlen($msId) !== 6) {
-            $msId = phore_random_str(6);
-        }
-
         $origin = $request->getHeader("referer")[0] ?? null;
         if ($origin !== null && ! in_array(substr($origin, 0, -1), $config->allow_origins, true)) {
             $origin = substr($origin, 0, -1);
@@ -39,16 +34,17 @@ AppLoader::extend(function (BraceApp $app) {
 
         $jsText = file_get_contents(__DIR__ . "/../src/webanalytics.js");
         $jsText = str_replace(
-            ["%%ENDPOINT_URL%%", "%%SESSION_ID%%"],
+            ["%%ENDPOINT_URL%%", "%%RAND%%", "%%SERVER_DATE%%", "%%SUBSCRIPTION_ID%%"],
             [
                 "//" . $app->request->getUri()->getHost() . "/analytics/emit?subscription_id=$subscriptionId",
-                $msId
+                phore_random_str(6),
+                gmdate("Y-m-d H:i:s"),
+                $subscriptionId
             ],
             $jsText
         );
 
         $response = $app->responseFactory->createResponseWithBody($jsText, 200, ["Content-Type" => "application/javascript"]);
-        $response = Cookie::setCookie($response, "MSID", $msId);
         return $response;
     });
 
