@@ -55,6 +55,7 @@ AppLoader::extend(function (BraceApp $app) {
             "referer" => $request->getHeader("Referer")[0] ?? "unset",
             "ip" => $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip",
             "host" => gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"),
+            "href" => $data["href"] ?? "*undefined href*",
             "data" => yaml_emit($data)
         ]);
 

@@ -1,10 +1,11 @@
 {mail to=email name=email}
 {mail from="sender@address.de" name="Micx Webanalytics"}
 {mail charset="utf-8"}
-{subject}Website hit {=referer}{/subject}
+{subject}Website hit {=href}{/subject}
 
-IP..: {=ip}
-Host: {=host}
+IP.....: {=ip}
+Host...: {=host}
+Referer: {=referer}
 
 {=data}
 
