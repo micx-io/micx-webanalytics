@@ -51,7 +51,7 @@ class Visitor
         $ret .= "\nFirst-Visit: " . $this->visitor_id_gmdate . " Last-Visit: " . $this->last_visit_gmdate . " Visits: " . $this->visits;
         $ret .= "\n";
         foreach ($this->track as $track) {
-            $ret .= "\n" . $track["referer"] . " [" . (int)$track["duration"] . "]";
+            $ret .= "\n" . $track["href"] . " [" . (int)$track["duration"] . "]";
         }
         return $ret;
     }
