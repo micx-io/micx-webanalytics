@@ -21,7 +21,10 @@
         qLoadSession(true);
         return;
       }
-      $("html, body").animate({scrollTop: frame.te,}, frame.d * 1000);
+      $("html, body")
+        .animate({scrollTop: frame.y}, frame.d * 1000)
+        .animate({zoom: frame.z}, frame.d * 1000)
+        .animate({scrollLeft: frame.x}, frame.d * 1000);
 
       window.setTimeout(() => {
         sTo(track.shift());
@@ -52,8 +55,10 @@
           let dimensions = data.window.split("x");
           let y = parseInt(dimensions[0]);
           let x = parseInt(dimensions[1]);
-          window.open(data.href, null, `width=${y} height=${x}`);
-          return;
+          if (! params.has("popup")) {
+            window.open(window.location.href + "&popup=1", "_blanc", `width=${y} height=${x}`);
+            return;
+          }
         }
 
         if (window.location.href !== data.href) {

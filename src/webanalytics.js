@@ -71,7 +71,7 @@
     ssd = JSON.parse(ssd);
     ssd.conversions = {};
     console.log("reload track")
-    ssd.track = [{s:timeofs(), d: 0, ts: window.scrollY, te: window.scrollY}]
+    ssd.track = [{s:timeofs(), d: 0, x: window.scrollX, y: window.scrollY, z: window.devicePixelRatio}]
   }
   ssd.session_seq++;
   sessionStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(ssd));
@@ -86,12 +86,15 @@
       window.clearTimeout(s_debounce);
     }
     if (s_evt === null) {
-      s_evt = {s:timeofs(), d: null, ts: window.scrollY, te: null}
+      s_evt = {s:timeofs(), d: null, x: null, y: null, z: null}
     }
 
     s_debounce = window.setTimeout(() => {
       s_evt.d = trim(timeofs() - s_evt.s);
-      s_evt.te = window.scrollY;
+      s_evt.y = window.scrollY;
+      s_evt.x = window.scrollX;
+      s_evt.z = window.devicePixelRatio;
+
       if (ssd.track.length < 500)
         ssd.track.push(s_evt);
       s_evt = null;
@@ -125,7 +128,7 @@
       wakeups: wakeups++
     }
 
-    data.track.push({s:timeofs(), d: 0, ts: window.scrollY, te: window.scrollY});
+    data.track.push({s:timeofs(), d: 0, x: window.scrollX, y: window.scrollY, z: window.devicePixelRatio});
 
     console.log("send track");
     navigator.sendBeacon(endpoint_url + "&endpoint_key=" + ssd.endpoint_key, JSON.stringify(data));
