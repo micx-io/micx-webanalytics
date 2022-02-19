@@ -53,8 +53,10 @@ class Visitor
 
     public function getReport() : string
     {
+        $link = explode("#", $this->href)[0] . "?micx-wa-session={$this->session_id}&micx-wa-key=" . sha1(FE_SECRET . $this->session_id);
+
         $ret  = "\n-----------------------------";
-        $ret  .= "\nReplay: {$this->href}?micx-wa-session={$this->session_id}&micx-wa-key=" . sha1(FE_SECRET . $this->session_id);
+        $ret  .= "\nReplay: $link";
 
         $ret .= "\nHit-Date..: " . date("Y-m-d H:i:s", $this->ts);
         $ret .= "\nHost: " . $this->host . " Duration: " . $this->total_online_time;
