@@ -21,7 +21,7 @@
         qLoadSession(true);
         return;
       }
-      $("html, body").animate({scrollTop: frame.te,}, frame.d);
+      $("html, body").animate({scrollTop: frame.te,}, frame.d * 1000);
 
       window.setTimeout(() => {
         sTo(track.shift());
