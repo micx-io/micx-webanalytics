@@ -92,7 +92,7 @@
     s_debounce = window.setTimeout(() => {
       s_evt.d = trim(timeofs() - s_evt.s);
       s_evt.te = window.scrollY;
-      if (ssd.track.length < 200)
+      if (ssd.track.length < 500)
         ssd.track.push(s_evt);
       s_evt = null;
     }, 200);
