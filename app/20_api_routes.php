@@ -52,6 +52,12 @@ AppLoader::extend(function (BraceApp $app) {
         return $response;
     });
 
+    $app->router->on("GET@/send", function (BraceApp $app) {
+        $app->command->runCommand("send");
+        return ["ok"];
+    });
+
+
     $app->router->on("GET@/analytics/emit", function (ServerRequest $request, Config $config) {
         $session_id = $request->getQueryParams()["session_id"] ?? null;
         $session_seq = (int)($request->getQueryParams()["session_seq"] ?? -1);
