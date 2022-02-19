@@ -38,7 +38,7 @@
       rd.session_seq++;
     sessionStorage.setItem("MICX_WA_SESSION", JSON.stringify(rd));
 
-    fetch(endpoint_url + `&session_id=${rd.session_id}&session_seq=${rd.session_seq}`)
+    fetch(endpoint_url + `&session_id=${rd.session_id}&session_seq=${rd.session_seq}&endpoint_key=${rd.endpoint_key}`)
       .then(response => response.json())
       .then(data => {
         console.log(data);

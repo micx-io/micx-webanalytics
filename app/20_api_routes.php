@@ -34,13 +34,16 @@ AppLoader::extend(function (BraceApp $app) {
 
         $jsText = file_get_contents(__DIR__ . "/../src/webanalytics.js");
         $jsText .= file_get_contents(__DIR__ . "/../src/wa_player.js");
+        $rand = phore_random_str(6);
+        $endpointKey = sha1($subscriptionId . $rand . FE_SECRET);
         $jsText = str_replace(
-            ["%%ENDPOINT_URL%%", "%%RAND%%", "%%SERVER_DATE%%", "%%SUBSCRIPTION_ID%%"],
+            ["%%ENDPOINT_URL%%", "%%RAND%%", "%%SERVER_DATE%%", "%%SUBSCRIPTION_ID%%", "%%ENDPOINT_KEY%%"],
             [
                 "//" . $app->request->getUri()->getHost() . "/analytics/emit?subscription_id=$subscriptionId",
-                phore_random_str(6),
+                $rand,
                 gmdate("Y-m-d H:i:s"),
-                $subscriptionId
+                $subscriptionId,
+                $endpointKey
             ],
             $jsText
         );
@@ -52,6 +55,10 @@ AppLoader::extend(function (BraceApp $app) {
     $app->router->on("GET@/analytics/emit", function (ServerRequest $request, Config $config) {
         $session_id = $request->getQueryParams()["session_id"] ?? null;
         $session_seq = (int)($request->getQueryParams()["session_seq"] ?? -1);
+        $endpoint_key = (string)($request->getQueryParams()["endpoint_key"] ?? "");
+
+        if ($endpoint_key !== sha1(FE_SECRET . $session_id))
+            throw new \InvalidArgumentException("Invalid endpoint key.");
 
         $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id);
 
@@ -70,9 +77,14 @@ AppLoader::extend(function (BraceApp $app) {
     });
 
     $app->router->on("POST@/analytics/emit", function(string $body, Config $config, ServerRequest $request) use ($app) {
+        $endpoint_key = (string)($request->getQueryParams()["endpoint_key"] ?? "");
+        $data = json_decode($body, true);
+
+        if ($endpoint_key !== sha1($config->subscription_id . $data["session_id"] . FE_SECRET))
+            throw new \InvalidArgumentException("Endpoint key invalid");
+
         $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id);
 
-        $data = json_decode($body, true);
         if (is_array($data)) {
             $data["ts"] = time();
             $data["ip"] = $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip";

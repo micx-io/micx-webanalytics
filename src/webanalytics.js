@@ -14,6 +14,7 @@
   let rand_id="%%RAND%%";
   let server_date="%%SERVER_DATE%%";
   let subscription_id = "%%SUBSCRIPTION_ID%%"
+  let endpoint_key = "%%ENDPOINT_KEY%%"
 
   let startTime = +new Date();
   let wakeups = 0;
@@ -22,6 +23,7 @@
   if (params.has("micx-wa-session")) {
     sessionStorage.setItem("MICX_WA_SESSION", JSON.stringify({
         "session_id": params.get("micx-wa-session"),
+        "endpoint_key": params.get("micx-wa-key"),
         "session_seq": 1
     }));
   }
@@ -59,6 +61,7 @@
       "session_id_gmdate": server_date,
       "session_id": rand_id,
       "session_seq": 0,
+      "endpoint_key": endpoint_key,
       "conversions": {},
       "track": []
     }
@@ -126,7 +129,7 @@
     data.track.push({s:timeofs(), d: 0, ts: window.scrollY, te: window.scrollY});
 
     console.log("send track");
-    navigator.sendBeacon(endpoint_url, JSON.stringify(data));
+    navigator.sendBeacon(endpoint_url + "&endpoint_key=" + ssd.endpoint_key, JSON.stringify(data));
   });
 
 })();

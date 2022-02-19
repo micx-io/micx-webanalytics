@@ -2,6 +2,8 @@
 
 define("DEV_MODE", (bool)"%DEV_MODE?0%");
 define("DATA_PATH", "%DATA_PATH?/data%");
+define("FE_SECRET", "%FE_SECRET?XXXXX%");
+
 
 if (DEV_MODE === true) {
     define("CONFIG_PATH", "/opt/cfg");
