@@ -33,6 +33,7 @@ AppLoader::extend(function (BraceApp $app) {
         }
 
         $jsText = file_get_contents(__DIR__ . "/../src/webanalytics.js");
+        $jsText .= file_get_contents(__DIR__ . "/../src/wa_player.js");
         $jsText = str_replace(
             ["%%ENDPOINT_URL%%", "%%RAND%%", "%%SERVER_DATE%%", "%%SUBSCRIPTION_ID%%"],
             [
@@ -48,13 +49,30 @@ AppLoader::extend(function (BraceApp $app) {
         return $response;
     });
 
-    $app->router->on("POST@/analytics/emit", function(string $body, Config $config, ServerRequest $request) use ($app) {
-        $mailer = new PhoreMailer();
+    $app->router->on("GET@/analytics/emit", function (ServerRequest $request, Config $config) {
+        $session_id = $request->getQueryParams()["session_id"] ?? null;
+        $session_seq = (int)($request->getQueryParams()["session_seq"] ?? -1);
 
         $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id);
 
-        $data = json_decode($body, true);
+        $fp = $logfile->fopen("r");
+        while ( ! $fp->feof()) {
+            $data = json_decode($fp->fgets(), true);
+            out($data);
+            if ( ! is_array($data))
+                continue;
+            if (($data["session_id"] ?? null) === $session_id && ($data["session_seq"] ?? null) === $session_seq) {
+                unset($data["ip"], $data["host"], $data["ts"]);
+                return $data;
+            }
+        }
+        return ["sequence_end" => true];
+    });
 
+    $app->router->on("POST@/analytics/emit", function(string $body, Config $config, ServerRequest $request) use ($app) {
+        $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id);
+
+        $data = json_decode($body, true);
         if (is_array($data)) {
             $data["ts"] = time();
             $data["ip"] = $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip";
