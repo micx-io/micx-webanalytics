@@ -104,7 +104,6 @@
       el.addEventListener("click", (e) => {
         let cid = e.target.getAttribute("micx-wa-conversion");
         ssd.conversions[cid] = timeofs();
-        //ssd.track.push([])
       })
     }
   });

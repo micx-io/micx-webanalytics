@@ -43,6 +43,7 @@
       .then(data => {
         console.log(data);
         if (data.sequence_end === true) {
+          sessionStorage.removeItem("MICX_WA_SESSION");
           alert("Sequence ended");
           window.close();
           return;
