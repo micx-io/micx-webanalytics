@@ -129,8 +129,6 @@
     }
 
     data.track.push({s:timeofs(), d: 0, x: window.scrollX, y: window.scrollY, z: window.devicePixelRatio});
-
-    console.log("send track");
     navigator.sendBeacon(endpoint_url + "&endpoint_key=" + ssd.endpoint_key, JSON.stringify(data));
   });
 
