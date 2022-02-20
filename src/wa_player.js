@@ -28,7 +28,7 @@
 
       window.setTimeout(() => {
         sTo(track.shift());
-      }, (frame.s - timeofs()) * 1000)
+      }, (frame.s - timeofs() + frame.d) * 1000)
     }
     let frame = track.shift()
     $("html, body").scrollTop = frame.ts;
