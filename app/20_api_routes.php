@@ -24,7 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 AppLoader::extend(function (BraceApp $app) {
 
 
-    $app->router->on("GET@/webanalytics.js", function (BraceApp $app, string $subscriptionId, Config $config, ServerRequestInterface $request) {
+    $app->router->on("GET@/v1/webanalytics/wa.js", function (BraceApp $app, string $subscriptionId, Config $config, ServerRequestInterface $request) {
 
         $origin = $request->getHeader("referer")[0] ?? null;
         if ($origin !== null && ! in_array(substr($origin, 0, -1), $config->allow_origins, true)) {
@@ -39,7 +39,7 @@ AppLoader::extend(function (BraceApp $app) {
         $jsText = str_replace(
             ["%%ENDPOINT_URL%%", "%%RAND%%", "%%SERVER_DATE%%", "%%SUBSCRIPTION_ID%%", "%%ENDPOINT_KEY%%"],
             [
-                "//" . $app->request->getUri()->getHost() . "/analytics/emit?subscription_id=$subscriptionId",
+                "//" . $app->request->getUri()->getHost() . "/v1/webanalytics/emit?subscription_id=$subscriptionId",
                 $rand,
                 gmdate("Y-m-d H:i:s"),
                 $subscriptionId,
@@ -52,13 +52,13 @@ AppLoader::extend(function (BraceApp $app) {
         return $response;
     });
 
-    $app->router->on("GET@/send", function (BraceApp $app) {
+    $app->router->on("GET@/v1/webanalytics/send", function (BraceApp $app) {
         $app->command->runCommand("send");
         return ["ok"];
     });
 
 
-    $app->router->on("GET@/analytics/emit", function (ServerRequest $request, Config $config) {
+    $app->router->on("GET@/v1/webanalytics/emit", function (ServerRequest $request, Config $config) {
         $session_id = $request->getQueryParams()["session_id"] ?? null;
         $session_seq = (int)($request->getQueryParams()["session_seq"] ?? -1);
         $endpoint_key = (string)($request->getQueryParams()["endpoint_key"] ?? "");
@@ -82,7 +82,7 @@ AppLoader::extend(function (BraceApp $app) {
         return ["sequence_end" => true];
     });
 
-    $app->router->on("POST@/analytics/emit", function(string $body, Config $config, ServerRequest $request) use ($app) {
+    $app->router->on("POST@/v1/webanalytics/emit", function(string $body, Config $config, ServerRequest $request) use ($app) {
         $endpoint_key = (string)($request->getQueryParams()["endpoint_key"] ?? "");
         $data = json_decode($body, true);
 
@@ -105,7 +105,7 @@ AppLoader::extend(function (BraceApp $app) {
     });
 
 
-    $app->router->on("GET@/", function() {
+    $app->router->on("GET@/v1/webanalytics/", function() {
         return ["system" => "micx webanalytics", "status" => "ok"];
     });
 
