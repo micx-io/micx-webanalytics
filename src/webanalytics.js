@@ -20,6 +20,9 @@
   let wakeups = 0;
 
   let params = new URLSearchParams(window.location.search);
+
+
+
   if (params.has("micx-wa-session")) {
     sessionStorage.setItem("MICX_WA_SESSION", JSON.stringify({
         "session_id": params.get("micx-wa-session"),
@@ -28,9 +31,11 @@
     }));
   }
 
+  if (params.has("micx-wa-disable"))
+    localStorage.setItem("MICX_WA_DISABLED", params.get("micx-wa-disable"));
 
-
-  if (sessionStorage.getItem("MICX_WA_SESSION")) {
+  if (sessionStorage.getItem("MICX_WA_SESSION") || localStorage.getItem("MICX_WA_DISABLED") === "1") {
+    console.warn("Micx WA disabled");
     return;
   }
   let trim = (num) => {
@@ -40,6 +45,8 @@
   let timeofs = () => {
     return trim((+new Date() - startTime) / 1000);
   }
+
+
 
   let lsd = localStorage.getItem("MICX_ANALYTICS_" + subscription_id);
   if (lsd === null) {
@@ -63,6 +70,9 @@
       "session_seq": 0,
       "endpoint_key": endpoint_key,
       "conversions": {},
+      "mouse_track": 0,
+      "mouse_clicks": 0,
+      "scroll_track": 0,
       "track": []
     }
     lsd.visits++;
@@ -70,18 +80,23 @@
     lsd.last_visit_gmdate = server_date;
     ssd = JSON.parse(ssd);
     ssd.conversions = {};
-    console.log("reload track")
     ssd.track = [{s:timeofs(), d: 0, x: window.scrollX, y: window.scrollY, z: window.devicePixelRatio}]
   }
   ssd.session_seq++;
   sessionStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(ssd));
   localStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(lsd));
 
-
+  document.addEventListener("mousedown", (e)=>{
+    ssd.mouse_clicks++;
+  });
+  document.addEventListener("mousemove", (e)=>{
+    ssd.mouse_track++;
+  });
 
   let s_debounce = null;
   let s_evt = null;
   window.addEventListener("scroll", (e) => {
+    ssd.scroll_track++;
     if (s_debounce !== null) {
       window.clearTimeout(s_debounce);
     }

@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 BraceDbg::SetupEnvironment(true, ["192.168.178.20", "localhost", "localhost:8080"]);
 
 
+
 AppLoader::extend(function () {
     $app = new BraceApp();
     $app->addModule(new BraceRequestLaminasModule());

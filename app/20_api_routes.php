@@ -27,9 +27,8 @@ AppLoader::extend(function (BraceApp $app) {
 
     $app->router->on("GET@/v1/webanalytics/wa.js", function (BraceApp $app, string $subscriptionId, Config $config, ServerRequestInterface $request) {
 
-        $origin = $request->getHeader("referer")[0] ?? null;
-        if ($origin !== null && ! in_array(substr($origin, 0, -1), $config->allow_origins, true)) {
-            $origin = substr($origin, 0, -1);
+        $origin = $request->getHeader("referer")[0] ?? "";
+        if ( ! origin_match($origin, $config->allow_origins)) {
             $origin = addslashes($origin);
             $subscriptionId = addslashes($subscriptionId);
             return $app->responseFactory->createResponseWithBody(
@@ -77,7 +76,7 @@ AppLoader::extend(function (BraceApp $app) {
         $fp = $logfile->fopen("r");
         while ( ! $fp->feof()) {
             $data = json_decode($fp->fgets(), true);
-            out($data);
+
             if ( ! is_array($data))
                 continue;
             if (($data["session_id"] ?? null) === $session_id && ($data["session_seq"] ?? null) === $session_seq) {

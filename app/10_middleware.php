@@ -17,13 +17,14 @@ use Brace\Session\Storages\CookieSessionStorage;
 use Micx\FormMailer\Config\Config;
 
 
+
 AppLoader::extend(function (BraceApp $app) {
 
     $app->setPipe([
         new BodyMiddleware(),
         new ExceptionHandlerMiddleware(),
         new CorsMiddleware([], function (string $subscriptionId, Config $config, string $origin) {
-            return in_array($origin, $config->allow_origins);
+            return origin_match($origin, $config->allow_origins);
         }),
 
 

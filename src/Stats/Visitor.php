@@ -53,7 +53,7 @@ class Visitor
 
     public function getReport() : string
     {
-        $link = explode("#", $this->href)[0] . "?micx-wa-session={$this->session_id}&micx-wa-key=" . sha1(FE_SECRET . $this->session_id);
+        $link = explode("?", explode("#", $this->href)[0])[0] . "?micx-wa-disable=1&micx-wa-session={$this->session_id}&micx-wa-key=" . sha1(FE_SECRET . $this->session_id);
 
         $ret  = "\n-----------------------------";
         $ret  .= "\nReplay: $link";
@@ -66,7 +66,10 @@ class Visitor
         $ret .= "\nConversions: " . implode(",", array_keys($this->conversions ?? []));
         $ret .= "\n";
         foreach ($this->track as $track) {
-            $ret .= "\n" . $track["href"] . " [" . (int)$track["duration"] . "s " . implode(",", array_keys($track["conversions"] ?? [])) . "]";
+            $track["mouse_track"] = (int)($track["mouse_track"] ?? 0);
+            $track["mouse_clicks"] = (int)($track["mouse_clicks"] ?? 0);
+            $track["scroll_track"] = (int)($track["scroll_track"] ?? 0);
+            $ret .= "\n" . $track["href"] . " [d:" . (int)$track["duration"] . "s mt:{$track["mouse_track"]} st:{$track["scroll_track"]} mc:{$track["mouse_clicks"]} c:" . implode(",", array_keys($track["conversions"] ?? [])) . "]";
         }
         return $ret;
     }
