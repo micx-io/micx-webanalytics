@@ -20,6 +20,7 @@ use Laminas\Diactoros\ServerRequest;
 use Micx\FormMailer\Config\Config;
 use Phore\Mail\PhoreMailer;
 use Psr\Http\Message\ServerRequestInterface;
+use function Sodium\add;
 
 AppLoader::extend(function (BraceApp $app) {
 
@@ -29,7 +30,12 @@ AppLoader::extend(function (BraceApp $app) {
         $origin = $request->getHeader("referer")[0] ?? null;
         if ($origin !== null && ! in_array(substr($origin, 0, -1), $config->allow_origins, true)) {
             $origin = substr($origin, 0, -1);
-            $error = "Invalid origin: '$origin' - not allowed for subscription_id '$subscriptionId'";
+            $origin = addslashes($origin);
+            $subscriptionId = addslashes($subscriptionId);
+            return $app->responseFactory->createResponseWithBody(
+                "console.log('Webanalytics: Invalid origin $origin for subscriptionId $subscriptionId')",
+                403, ["content-type"=>"text/javascript"]
+            );
         }
 
         $jsText = file_get_contents(__DIR__ . "/../src/webanalytics.js");

@@ -13,7 +13,7 @@ use Phore\Di\Container\Producer\DiValue;
 use Psr\Http\Message\ServerRequestInterface;
 
 
-#BraceDbg::SetupEnvironment(true, ["192.168.178.20", "localhost", "localhost:8080", "formmailer.srv.infracamp.org"]);
+BraceDbg::SetupEnvironment(true, ["192.168.178.20", "localhost", "localhost:8080"]);
 
 
 AppLoader::extend(function () {

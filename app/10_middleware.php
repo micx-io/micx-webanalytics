@@ -21,12 +21,13 @@ AppLoader::extend(function (BraceApp $app) {
 
     $app->setPipe([
         new BodyMiddleware(),
+        new ExceptionHandlerMiddleware(),
         new CorsMiddleware([], function (string $subscriptionId, Config $config, string $origin) {
             return in_array($origin, $config->allow_origins);
         }),
 
-        new ExceptionHandlerMiddleware(),
-        new SessionMiddleware(new CookieSessionStorage("SECRET_KEY_ABCDEFG_ABCDEDF")),
+
+
         new RouterEvalMiddleware(),
         new RouterDispatchMiddleware([
             new JsonReturnFormatter($app)
