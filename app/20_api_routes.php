@@ -48,8 +48,13 @@ AppLoader::extend(function (BraceApp $app) {
             );
         }
 
-        $jsText = file_get_contents(__DIR__ . "/../src/webanalytics.js");
-        $jsText .= file_get_contents(__DIR__ . "/../src/wa_player.js");
+        if (isset ($request->getQueryParams()["player"])) {
+            $jsText = file_get_contents(__DIR__ . "/../src/wa_player.js");
+        } else {
+            $jsText = file_get_contents(__DIR__ . "/../src/webanalytics.js");
+        }
+
+
         $rand = phore_random_str(6);
         $endpointKey = sha1($subscriptionId . $rand . FE_SECRET);
         $jsText = str_replace(
