@@ -21,20 +21,10 @@
 
   let params = new URLSearchParams(window.location.search);
 
-
-
-  if (params.has("micx-wa-session")) {
-    sessionStorage.setItem("MICX_WA_SESSION", JSON.stringify({
-        "session_id": params.get("micx-wa-session"),
-        "endpoint_key": params.get("micx-wa-key"),
-        "session_seq": 1
-    }));
-  }
-
   if (params.has("micx-wa-disable"))
     localStorage.setItem("MICX_WA_DISABLED", params.get("micx-wa-disable"));
 
-  if (sessionStorage.getItem("MICX_WA_SESSION") || localStorage.getItem("MICX_WA_DISABLED") === "1") {
+  if (params.has("micx-wa-session") || sessionStorage.getItem("MICX_WA_SESSION") !== null|| localStorage.getItem("MICX_WA_DISABLED") === "1") {
     console.warn("Micx WA disabled");
     return;
   }
@@ -45,8 +35,6 @@
   let timeofs = () => {
     return trim((+new Date() - startTime) / 1000);
   }
-
-
 
   let lsd = localStorage.getItem("MICX_ANALYTICS_" + subscription_id);
   if (lsd === null) {

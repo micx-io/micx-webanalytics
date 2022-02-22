@@ -7,6 +7,19 @@
   let startTime = +new Date();
   let params = new URLSearchParams(window.location.search);
 
+  if (params.has("micx-wa-session")) {
+    if (! params.has("popup")) {
+      document.body.append(document.createElement("micx-wa-player"));
+    } else {
+      sessionStorage.setItem("MICX_WA_SESSION", JSON.stringify({
+        "session_id": params.get("micx-wa-session"),
+        "endpoint_key": params.get("micx-wa-key"),
+        "session_seq": 1
+      }));
+    }
+  }
+
+
   let clickDiv = null;
 
   let trim = (num) => {
@@ -63,13 +76,7 @@
           window.close();
           return;
         }
-        if (params.has("micx-wa-session")) {
 
-          if (! params.has("popup")) {
-            document.body.append(document.createElement("micx-wa-player"));
-            return;
-          }
-        }
 
         if (window.location.href !== data.href) {
           window.location.href = data.href;
