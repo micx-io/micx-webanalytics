@@ -1,8 +1,13 @@
 
 (()=>{
   let endpoint_url="%%ENDPOINT_URL%%";
+  let subscription_id = "%%SUBSCRIPTION_ID%%"
+  let endpoint_key = "%%ENDPOINT_KEY%%"
+
   let startTime = +new Date();
   let params = new URLSearchParams(window.location.search);
+
+  let clickDiv = null;
 
   let trim = (num) => {
     return Math.trunc(num * 10) / 10;
@@ -16,15 +21,22 @@
     console.log ("play track:", track, track.length);
 
     let sTo = (frame) => {
-      console.log("frame", frame);
       if (typeof frame === "undefined") {
         qLoadSession(true);
         return;
       }
-      $("html, body")
-        .animate({scrollTop: frame.y}, frame.d * 1000)
-        .animate({zoom: frame.z}, frame.d * 1000)
-        .animate({scrollLeft: frame.x}, frame.d * 1000);
+      if (frame.k === true) {
+        clickDiv.style.display = "block";
+        clickDiv.style.top = frame.y + "px";
+        clickDiv.style.left = frame.x + "px";
+        window.setTimeout(()=>{clickDiv.style.display = "none"}, 200)
+      } else {
+        $("html, body")
+          .animate({scrollTop: frame.y}, frame.d * 1000)
+          .animate({zoom: frame.z}, frame.d * 1000)
+          .animate({scrollLeft: frame.x}, frame.d * 1000);
+      }
+
 
       window.setTimeout(() => {
         sTo(track.shift());
@@ -41,7 +53,7 @@
       rd.session_seq++;
     sessionStorage.setItem("MICX_WA_SESSION", JSON.stringify(rd));
 
-    fetch(endpoint_url + `&session_id=${rd.session_id}&session_seq=${rd.session_seq}&endpoint_key=${rd.endpoint_key}`)
+    fetch(endpoint_url + `emit?subscription_id=${subscription_id}&session_id=${rd.session_id}&session_seq=${rd.session_seq}&endpoint_key=${rd.endpoint_key}`)
       .then(response => response.json())
       .then(data => {
         console.log(data);
@@ -52,11 +64,9 @@
           return;
         }
         if (params.has("micx-wa-session")) {
-          let dimensions = data.window.split("x");
-          let y = parseInt(dimensions[0]);
-          let x = parseInt(dimensions[1]);
+
           if (! params.has("popup")) {
-            window.open(window.location.href + "&popup=1", "_blanc", `width=${y} height=${x}`);
+            document.body.append(document.createElement("micx-wa-player"));
             return;
           }
         }
@@ -75,12 +85,75 @@
     if (typeof jQuery === "undefined") {
       document.writeln(`<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>`);
     }
+
+    let pointer = document.createElement("div");
+    document.body.append(pointer);
+    let shadow = pointer.attachShadow({mode: "closed"});
+    shadow.innerHTML = `
+        <div style='position:fixed;box-shadow: 0 0 5px black;width:21px;height:21px;border-radius: 20px;margin-top:-10px;margin-left:-10px;border: 1px solid #888888;background-color:white;z-index: 999999;'>
+            <div style="width:9px;height:9px;margin:5px;background-color: #009999;border-radius: 10px;"></div>
+        </div>`;
+
+    clickDiv = shadow.firstElementChild;
+
+
     document.addEventListener("DOMContentLoaded", ()=> {
       console.log(window.innerHeight, window.innerWidth);
-
-
       qLoadSession()
     });
   }
 
+
+  class MicxWaPlayerCompontent extends HTMLElement {
+
+    constructor() {
+      super();
+      this.endpoint_url="%%ENDPOINT_URL%%";
+      this.shadow = this.attachShadow({mode: "closed"});
+    }
+
+    connectedCallback() {
+      fetch(endpoint_url + `emit?subscription_id=${subscription_id}&session_id=${params.get("micx-wa-session")}&session_seq=1&endpoint_key=${params.get("micx-wa-key")}`)
+        .then(resp=>resp.json())
+        .then((data)=> {
+          let dimensions = data.window.split("x");
+          let y = parseInt(dimensions[0]);
+          let x = parseInt(dimensions[1]);
+
+          this.shadow.innerHTML = `
+              <link type="text/css" rel="stylesheet" href="${this.endpoint_url}player?css">
+
+              <div class="player">
+                <h1>Replay Session: <span data="session_id_gmdate"></span></h1>
+                <p>
+                    First visit: <span data="visitor_id_gmdate"></span>
+                    #Visit: <span data="visits"></span>
+                    #_cpg: <span data="visitor_cpg"></span>
+                    #_tg: <span data="visitor_tg"></span>
+                </p>
+                <p>Last visit: <span data="last_visit_gmdate"></span></p>
+                <p>User-Agent: <span data="user_agent"></span> Language: <span data="language"></span></p>
+                <p>HREF: <span data="href"></span> (Duration:<span data="duration"></span>sec)</p>
+
+                <a id="openLink" href="javascript:;">Start player in new window</a>
+              </div>`;
+
+          for(let el of this.shadow.querySelectorAll("*[data]")) {
+            el.textContent = data[el.getAttribute("data")];
+          }
+
+          this.shadow.getElementById("openLink").addEventListener("click", (e)=>{
+            window.open(window.location.href + "&popup=1", "_blanc", `width=${y} height=${x}`);
+          });
+        });
+
+
+
+
+    }
+  }
+  customElements.define("micx-wa-player", MicxWaPlayerCompontent);
 })();
+
+
+

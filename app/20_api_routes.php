@@ -25,6 +25,17 @@ use function Sodium\add;
 AppLoader::extend(function (BraceApp $app) {
 
 
+    $app->router->on("GET@/v1/webanalytics/player", function (ServerRequestInterface $request) use($app) {
+        switch ($request->getUri()->getQuery()) {
+            case "css":
+                return $app->responseFactory->createResponseWithBody(
+                    file_get_contents(__DIR__ . "/../src/player.css"),
+                    200, ["content-type" => "text/css"]
+                );
+        }
+    });
+
+
     $app->router->on("GET@/v1/webanalytics/wa.js", function (BraceApp $app, string $subscriptionId, Config $config, ServerRequestInterface $request) {
 
         $origin = $request->getHeader("referer")[0] ?? "";
@@ -44,7 +55,7 @@ AppLoader::extend(function (BraceApp $app) {
         $jsText = str_replace(
             ["%%ENDPOINT_URL%%", "%%RAND%%", "%%SERVER_DATE%%", "%%SUBSCRIPTION_ID%%", "%%ENDPOINT_KEY%%"],
             [
-                "//" . $app->request->getUri()->getHost() . "/v1/webanalytics/emit?subscription_id=$subscriptionId",
+                "//" . $app->request->getUri()->getHost() . "/v1/webanalytics/",
                 $rand,
                 gmdate("Y-m-d H:i:s"),
                 $subscriptionId,

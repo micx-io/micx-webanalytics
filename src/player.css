@@ -1,0 +1,24 @@
+.player {
+    position: fixed;
+    top: 0;
+
+
+    left:auto;
+
+
+    margin-top:5px;
+    margin-left:5px;
+    border-radius: 10px;
+    box-shadow: 10px 10px 10px #555555;
+    z-index: 99999;
+    width: 50%;
+    height: auto;
+    min-width: 400px;
+    border:1px solid black;
+    background: gainsboro;
+    padding: 10px;
+}
+
+h1 {
+    font-size: 16px;
+}

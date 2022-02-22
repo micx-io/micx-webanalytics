@@ -53,6 +53,8 @@
     lsd = {
       "visitor_id_gmdate": server_date,
       "visitor_id": rand_id,
+      "visitor_cpg": params.get("_cpg"),
+      "visitor_tg": params.get("_tg"),
       "visitor_seq": 0,
       "visits": 0,
       "last_visit_gmdate": server_date
@@ -87,6 +89,7 @@
   localStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(lsd));
 
   document.addEventListener("mousedown", (e)=>{
+    ssd.track.push({s:timeofs(), d: 0.2, x: e.clientX, y: e.clientY, k: true});
     ssd.mouse_clicks++;
   });
   document.addEventListener("mousemove", (e)=>{
@@ -144,7 +147,7 @@
     }
 
     data.track.push({s:timeofs(), d: 0, x: window.scrollX, y: window.scrollY, z: window.devicePixelRatio});
-    navigator.sendBeacon(endpoint_url + "&endpoint_key=" + ssd.endpoint_key, JSON.stringify(data));
+    navigator.sendBeacon(endpoint_url + `emit?subscription_id=${subscription_id}&endpoint_key=${ssd.endpoint_key}`, JSON.stringify(data));
   });
 
 })();
