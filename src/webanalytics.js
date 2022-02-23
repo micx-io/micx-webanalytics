@@ -52,6 +52,9 @@
       "visitor_id": rand_id,
       "visitor_cpg": params.get("_cpg"),
       "visitor_tg": params.get("_tg"),
+      "visitor_keyword": params.get("_keyword"),
+      "visitor_location": params.get("_loc"),
+      "visitor_device": params.get("_device"),
       "visitor_seq": 0,
       "visits": 0,
       "last_visit_gmdate": server_date
