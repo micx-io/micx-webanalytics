@@ -15,6 +15,10 @@
   let server_date="%%SERVER_DATE%%";
   let subscription_id = "%%SUBSCRIPTION_ID%%"
   let endpoint_key = "%%ENDPOINT_KEY%%"
+  let page_id = "undefined"
+  let metaLastModified = document.head.querySelector("meta[name='last-modified']")
+  if (metaLastModified !== null)
+    page_id = metaLastModified.getAttribute("content");
 
   let startTime = +new Date();
   let wakeups = 0;
@@ -62,6 +66,7 @@
     ssd = {
       "session_id_gmdate": server_date,
       "session_id": rand_id,
+      "page_id": page_id,
       "session_seq": 0,
       "endpoint_key": endpoint_key,
       "conversions": {},

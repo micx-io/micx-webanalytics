@@ -118,6 +118,17 @@ AppLoader::extend(function (BraceApp $app) {
             $data["host"] = gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1");
             $data["referer"] = $request->getHeader("Referer")[0] ?? "unset";
             $logfile->append_content(json_encode($data) . "\n");
+
+            // Download
+            if (origin_match($data["href"], $config->allow_origins)) {
+               $siteConfigFile = getSiteDataStorePath($config->subscription_id, $data["href"], $data["page_id"] ?? "missing");
+               if ( ! $siteConfigFile->exists()) {
+                   $siteConfigFile->createPath()->set_contents(
+                       phore_http_request($data["href"])->send()->getBody()
+                   );
+               }
+            }
+
         }
 
 
