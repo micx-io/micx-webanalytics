@@ -58,7 +58,7 @@ class Visitor
         $ret  = "\n-----------------------------";
         $ret  .= "\nReplay: $link";
 
-        foreach(["visitor_keywords","visitor_device","visitor_cpg","visitor_location"] as $key) {
+        foreach(["visitor_keyword","visitor_device","visitor_cpg","visitor_location"] as $key) {
             if ( ! isset($this->track[0][$key]))
                 $this->track[0][$key] = "unkown";
         }
@@ -69,7 +69,7 @@ class Visitor
         $ret .= "\nScreen.....: " . $this->screen . " Lang: " . $this->language;
         $ret .= "\nFirst-Visit: " . $this->visitor_id_gmdate . " Last-Visit: " . $this->last_visit_gmdate . " Visits: " . $this->visits;
         $ret .= "\nConversions: " . implode(",", array_keys($this->conversions ?? []));
-        $ret .= "\nKeywords...: " . $this->track[0]["visitor_keywords"] ?? "unknown";
+        $ret .= "\nKeywords...: " . $this->track[0]["visitor_keyword"] ?? "unknown";
         $ret .= "\nDevice.....: " . $this->track[0]["visitor_device"] ?? "unknown";
         $ret .= "\nCampaign...: " . $this->track[0]["visitor_cpg"] ?? "unknown";
         $ret .= "\nLocation...: " . $this->track[0]["visitor_location"] ?? "unknown";
