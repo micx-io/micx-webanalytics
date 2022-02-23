@@ -17,7 +17,6 @@ use Brace\Session\Storages\CookieSessionStorage;
 use Micx\FormMailer\Config\Config;
 
 
-
 AppLoader::extend(function (BraceApp $app) {
 
     $app->setPipe([

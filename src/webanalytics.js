@@ -76,6 +76,7 @@
       "mouse_track": 0,
       "mouse_clicks": 0,
       "scroll_track": 0,
+      "key_downs": 0,
       "track": []
     }
     lsd.visits++;
@@ -93,8 +94,13 @@
     ssd.track.push({s:timeofs(), d: 0.2, x: e.clientX, y: e.clientY, k: true});
     ssd.mouse_clicks++;
   });
+
   document.addEventListener("mousemove", (e)=>{
     ssd.mouse_track++;
+  });
+
+  document.addEventListener("keydown", (e)=>{
+    ssd.key_downs++;
   });
 
   let s_debounce = null;

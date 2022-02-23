@@ -58,18 +58,28 @@ class Visitor
         $ret  = "\n-----------------------------";
         $ret  .= "\nReplay: $link";
 
-        $ret .= "\nHit-Date..: " . date("Y-m-d H:i:s", $this->ts);
-        $ret .= "\nHost: " . $this->host . " Duration: " . $this->total_online_time;
-        $ret .= "\nUser-Agent: " . $this->user_agent;
-        $ret .= "\nScreen: " . $this->screen . " Lang: " . $this->language;
+        foreach(["visitor_keywords","visitor_device","visitor_cpg","visitor_location"] as $key) {
+            if ( ! isset($this->track[0][$key]))
+                $this->track[0][$key] = "unkown";
+        }
+
+        $ret .= "\nHit-Date...: " . date("Y-m-d H:i:s", $this->ts);
+        $ret .= "\nHost.......: " . $this->host . " Duration: " . $this->total_online_time;
+        $ret .= "\nUser-Agent.: " . $this->user_agent;
+        $ret .= "\nScreen.....: " . $this->screen . " Lang: " . $this->language;
         $ret .= "\nFirst-Visit: " . $this->visitor_id_gmdate . " Last-Visit: " . $this->last_visit_gmdate . " Visits: " . $this->visits;
         $ret .= "\nConversions: " . implode(",", array_keys($this->conversions ?? []));
+        $ret .= "\nKeywords...: " . $this->track[0]["visitor_keywords"] ?? "unknown";
+        $ret .= "\nDevice.....: " . $this->track[0]["visitor_device"] ?? "unknown";
+        $ret .= "\nCampaign...: " . $this->track[0]["visitor_cpg"] ?? "unknown";
+        $ret .= "\nLocation...: " . $this->track[0]["visitor_location"] ?? "unknown";
         $ret .= "\n";
         foreach ($this->track as $track) {
             $track["mouse_track"] = (int)($track["mouse_track"] ?? 0);
             $track["mouse_clicks"] = (int)($track["mouse_clicks"] ?? 0);
             $track["scroll_track"] = (int)($track["scroll_track"] ?? 0);
-            $ret .= "\n" . $track["href"] . " [d:" . (int)$track["duration"] . "s mt:{$track["mouse_track"]} st:{$track["scroll_track"]} mc:{$track["mouse_clicks"]} c:" . implode(",", array_keys($track["conversions"] ?? [])) . "]";
+            $track["key_downs"] = (int)($track["key_downs"] ?? 0);
+            $ret .= "\n" . substr(str_pad($track["href"], 60), 0, 60) . " [d:" . (int)$track["duration"] . "s mt:{$track["mouse_track"]} st:{$track["scroll_track"]} mc:{$track["mouse_clicks"]} key:{$track["key_downs"]} c:" . implode(",", array_keys($track["conversions"] ?? [])) . "]";
         }
         return $ret;
     }
