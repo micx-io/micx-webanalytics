@@ -127,14 +127,14 @@
 
   })
 
-  document.addEventListener("DOMContentLoaded", ()=> {
+  window.setTimeout(()=> {
     for (let el of document.querySelectorAll("*[micx-wa-conversion]")) {
       el.addEventListener("click", (e) => {
         let cid = e.target.getAttribute("micx-wa-conversion");
         ssd.conversions[cid] = timeofs();
       })
     }
-  });
+  }, 1000);
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== 'hidden')
