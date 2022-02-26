@@ -39,6 +39,30 @@ class FileStatsRunner
         return $report;
     }
 
+    private function getBasicLog(string $subscriptionId, int $fromTs, int $tillTs)
+    {
+        $log = "";
+        $logfile = phore_file(DATA_PATH . "/$subscriptionId.log");
+        if ( ! $logfile->exists())
+            return "";
+        $f = $logfile->fopen("r");
+        while ( ! $f->feof()) {
+            $data = json_decode($f->fgets(), true);
+            if ( ! is_array($data))
+                continue;
+
+            if ($data["ts"] < $fromTs || $data["ts"] > $tillTs)
+                continue;
+
+            $log .= implode(";", [
+                date("Y-m-d H:i:s", $data["ts"]),
+                $data["anon_ip"],
+                $data["referer"]
+            ]) . "\n";
+        }
+        return $log;
+    }
+
     public function runAll($dayOffset = 0)
     {
         $fromTs = strtotime(date ("Y-m-d 00:00:00", strtotime("-$dayOffset Day")));
@@ -51,18 +75,23 @@ class FileStatsRunner
             $subscriptionId = $configFile->getFilename();
             $config = phore_hydrate($configFile->assertFile()->get_yaml(), Config::class);
 
-            $logfile = phore_file(DATA_PATH . "/$subscriptionId");
 
-            if ( ! $logfile->exists())
-                continue;
+            $basicReport = $this->getBasicLog($subscriptionId, $fromTs, $tillTs);
 
-            $report = $this->run($logfile, $fromTs, $tillTs);
+            $logfile = phore_file(DATA_PATH . "/$subscriptionId.track");
+            $report = null;
+            if ($logfile->exists()) {
+                $report = $this->run($logfile, $fromTs, $tillTs);
+            }
+
+
+
 
             $mailer->send($template, [
                 "email" => $config->report_email,
                 "subscription_id" => $subscriptionId,
-                "data" => $report->getReport(),
-                "total" => count ($report->visitorMap)
+                "data" => $basicReport ."\n\n" . $report?->getReport(),
+                "total" => count ($report?->visitorMap ?? [])
             ]);
 
         }

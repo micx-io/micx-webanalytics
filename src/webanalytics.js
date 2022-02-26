@@ -29,10 +29,7 @@
     localStorage.setItem("MICX_WA_DISABLED", params.get("micx-wa-disable"));
 
   if (params.has("micx-wa-session") || sessionStorage.getItem("MICX_WA_SESSION") !== null || localStorage.getItem("MICX_WA_DISABLED") === "1") {
-    if (params.has("micx-wa-session") || sessionStorage.getItem("MICX_WA_SESSION") !== null) {
-      let purl = endpoint_url + `wa.js?subscription_id=${subscription_id}&player`;
-      document.writeln(`<script src="${purl}"></script>`);
-    }
+
 
     console.warn("Micx WA disabled");
     return;

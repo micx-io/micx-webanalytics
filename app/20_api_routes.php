@@ -50,8 +50,20 @@ AppLoader::extend(function (BraceApp $app) {
 
         if (isset ($request->getQueryParams()["player"])) {
             $jsText = file_get_contents(__DIR__ . "/../src/wa_player.js");
-        } else {
+        } elseif (isset($request->getQueryParams()["analytics"])) {
             $jsText = file_get_contents(__DIR__ . "/../src/webanalytics.js");
+        } else {
+            $log = [
+                "ts" => time(),
+                "ip" => anonymize_host_ip($request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip"),
+                "anon_ip" => substr(sha1($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"), 0, 8),
+                "host" => anonymize_host_ip(gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1")),
+                "referer" => $request->getHeader("Referer")[0] ?? "unset"
+            ];
+            $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id . ".log");
+            $logfile->append_content(json_encode($log) . "\n");
+
+            $jsText = file_get_contents(__DIR__ . "/../src/cookie-consent.js");
         }
 
 
@@ -87,7 +99,7 @@ AppLoader::extend(function (BraceApp $app) {
         if ($endpoint_key !== sha1(FE_SECRET . $session_id))
             throw new \InvalidArgumentException("Invalid endpoint key.");
 
-        $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id);
+        $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id . ".track");
 
         $fp = $logfile->fopen("r");
         while ( ! $fp->feof()) {
@@ -110,23 +122,25 @@ AppLoader::extend(function (BraceApp $app) {
         if ($endpoint_key !== sha1($config->subscription_id . $data["session_id"] . FE_SECRET))
             throw new \InvalidArgumentException("Endpoint key invalid");
 
-        $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id);
+        $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id . ".track");
 
         if (is_array($data)) {
             $data["ts"] = time();
-            $data["ip"] = $request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip";
-            $data["host"] = gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1");
+            $data["ip"] = anonymize_host_ip($request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip");
+            $data["anon_ip"] = substr(sha1($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"), 0, 8);
+            $data["host"] = anonymize_host_ip(gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"));
             $data["referer"] = $request->getHeader("Referer")[0] ?? "unset";
-            $logfile->append_content(json_encode($data) . "\n");
+
 
             // Download
             if (origin_match($data["href"], $config->allow_origins)) {
-               $siteConfigFile = getSiteDataStorePath($config->subscription_id, $data["href"], $data["page_id"] ?? "missing");
-               if ( ! $siteConfigFile->exists()) {
-                   $siteConfigFile->createPath()->set_contents(
+                $logfile->append_content(json_encode($data) . "\n");
+                $siteConfigFile = getSiteDataStorePath($config->subscription_id, $data["href"], $data["page_id"] ?? "missing");
+                if ( ! $siteConfigFile->exists()) {
+                    $siteConfigFile->createPath()->set_contents(
                        phore_http_request($data["href"])->send()->getBody()
-                   );
-               }
+                    );
+                }
             }
 
         }
