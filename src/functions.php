@@ -15,6 +15,6 @@ function getSiteDataStorePath(string $subscription_id, string $href, string $ver
 
 
 function anonymize_host_ip(string $input) {
-    $input = preg_replace("/^[0-9a-z]+\./i", "XXX.", $input);
+    $input = preg_replace("/^[0-9a-z\-]+\./i", "XXX.", $input);
     return $input;
 }
