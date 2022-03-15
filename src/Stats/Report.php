@@ -14,8 +14,8 @@ class Report
 
     public function inject (array $data)
     {
-        if ( ! isset ($this->visitorMap[$data["visitor_id"]])) {
-            $this->visitorMap[$data["visitor_id"]] = new Visitor(
+        if ( ! isset ($this->visitorMap[$data["session_id"]])) {
+            $this->visitorMap[$data["session_id"]] = new Visitor(
                 $data["ts"], $data["visitor_id"], $data["ip"], $data["host"], $data["visitor_id_gmdate"], $data["last_visit_gmdate"],
                 $data["visits"], $data["language"], $data["user_agent"], $data["screen"], $data["session_id"], $data["href"]
             );
@@ -27,7 +27,7 @@ class Report
             $this->conversions[$key]++;
         }
 
-        $this->visitorMap[$data["visitor_id"]]->inject($data);
+        $this->visitorMap[$data["session_id"]]->inject($data);
     }
 
 
