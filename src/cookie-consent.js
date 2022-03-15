@@ -12,7 +12,7 @@ class MicxCookieConsentElement extends HTMLElement {
         super();
     }
 
-    mountAnalytics() {
+    mountAnalytics(withTracking) {
       let endpoint_url="%%ENDPOINT_URL%%";
       let subscription_id = "%%SUBSCRIPTION_ID%%";
       let purl = endpoint_url + `wa.js?subscription_id=${subscription_id}&analytics`;
@@ -53,17 +53,20 @@ class MicxCookieConsentElement extends HTMLElement {
           consentBtn.addEventListener("click", (e)=>{
             consentData.consent = true;
             localStorage.setItem(locStorName, JSON.stringify(consentData));
-            this.mountAnalytics();
+            this.mountAnalytics(true);
             this.hideConsent();
           });
           declineBtn.addEventListener("click", (e)=>{
             consentData.consent = false;
             localStorage.setItem(locStorName, JSON.stringify(consentData));
             this.hideConsent();
+            this.mountAnalytics(false);
           });
         } else {
           if (consentData.consent === true) {
-            this.mountAnalytics();
+            this.mountAnalytics(true);
+          } else {
+            this.mountAnalytics(false);
           }
           this.hideConsent();
         }
