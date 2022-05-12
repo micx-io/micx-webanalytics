@@ -85,7 +85,7 @@
   }
   ssd.session_seq++;
   sessionStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(ssd));
-  //localStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(lsd));
+  localStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(lsd));
 
   document.addEventListener("mousedown", (e)=>{
     ssd.track.push({s:timeofs(), d: 0.2, x: e.clientX, y: e.clientY, k: true});
