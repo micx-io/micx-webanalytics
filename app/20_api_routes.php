@@ -53,15 +53,6 @@ AppLoader::extend(function (BraceApp $app) {
         } elseif (isset($request->getQueryParams()["analytics"])) {
             $jsText = file_get_contents(__DIR__ . "/../src/webanalytics.js");
         } else {
-            $log = [
-                "ts" => time(),
-                "ip" => anonymize_host_ip($request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip"),
-                "anon_ip" => substr(sha1($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"), 0, 8),
-                "host" => anonymize_host_ip(gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1")),
-                "referer" => $request->getHeader("Referer")[0] ?? "unset"
-            ];
-            $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id . ".log");
-            $logfile->append_content(json_encode($log) . "\n");
 
             $jsText = file_get_contents(__DIR__ . "/../src/cookie-consent.js");
         }
