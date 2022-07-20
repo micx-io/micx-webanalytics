@@ -47,7 +47,7 @@
           let elem = document.elementFromPoint(frame.x, frame.y);
           if (elem === null)
             return;
-          if (elem.hasAttribute("href"))
+          if (elem.hasAttribute("href") && elem.getAttribute("href") !== "")
             return;
           elem.focus();
           elem.click();
