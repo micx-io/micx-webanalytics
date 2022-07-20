@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<input id="i1" type="text">
+<script>
+  let el = document.getElementById("i1");
+  window.setInterval(() => {
+    var e = new Event("keydown", {
+      bubbles : true,
+      cancelable : true,
+      char : "Q",
+      key : "q",
+      shiftKey : true,
+      keyCode : 81
+    });
+      el.dispatchEvent(e);
+      console.log("dispatch", e);
+  }, 2000);
+</script>
+</body>
+</html>

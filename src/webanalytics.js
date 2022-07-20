@@ -97,6 +97,7 @@
   });
 
   document.addEventListener("keydown", (e)=>{
+    ssd.track.push({s:timeofs(), d: 0.2, x: e.clientX, y: e.clientY, key: e.key});
     ssd.key_downs++;
   });
 

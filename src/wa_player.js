@@ -42,7 +42,23 @@
         clickDiv.style.display = "block";
         clickDiv.style.top = frame.y + "px";
         clickDiv.style.left = frame.x + "px";
-        window.setTimeout(()=>{clickDiv.style.display = "none"}, 200)
+        window.setTimeout(() => {
+          clickDiv.style.display = "none";
+          let elem = document.elementFromPoint(frame.x, frame.y);
+          if (elem === null)
+            return;
+          if (elem.hasAttribute("href"))
+            return;
+          elem.focus();
+          elem.click();
+
+        }, 200)
+      } else if(typeof frame.key !== "undefined") {
+        let fe = document.activeElement;
+        if (fe === null)
+          return;
+        if (typeof fe.value !== "undefined")
+          fe.value += frame.key
       } else {
         $("html, body")
           .animate({scrollTop: frame.y}, frame.d * 1000)
