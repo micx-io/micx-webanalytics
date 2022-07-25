@@ -16,6 +16,7 @@
   let subscription_id = "%%SUBSCRIPTION_ID%%"
   let endpoint_key = "%%ENDPOINT_KEY%%"
   let page_id = "undefined"
+  let locationHref = window.location.href;
   let metaLastModified = document.head.querySelector("meta[name='last-modified']")
   if (metaLastModified !== null)
     page_id = metaLastModified.getAttribute("content");
@@ -142,7 +143,7 @@
       ...lsd,
       ...ssd,
 
-      href: window.location.href,
+      href: locationHref,
       user_agent: window.navigator.userAgent,
       language: window.navigator.language,
       screen: screen.width + "x" + screen.height,
