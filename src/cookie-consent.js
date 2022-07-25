@@ -34,7 +34,7 @@ class MicxCookieConsentElement extends HTMLElement {
     }
 
     connectedCallback() {
-      window.addEventListener("DOMContentLoaded", ()=> {
+      window.setTimeout(()=> {
         const locStorName = "MICX-COOKIE-CONSENT";
         const askAgain = 86400 * 1000;
         let consentData = {
@@ -71,7 +71,7 @@ class MicxCookieConsentElement extends HTMLElement {
           this.hideConsent();
         }
 
-      });
+      }, 5000);
   }
 }
 
