@@ -119,7 +119,7 @@
       s_evt.x = window.scrollX;
       s_evt.z = window.devicePixelRatio;
 
-      if (ssd.track.length < 500)
+      if (ssd.track.length < 5000)
         ssd.track.push(s_evt);
       s_evt = null;
     }, 200);
