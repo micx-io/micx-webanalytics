@@ -26,6 +26,14 @@
 
   let params = new URLSearchParams(window.location.search);
 
+  let getClickId = (element) => {
+    if (element instanceof HTMLElement && element.hasAttribute("data-wa-cid"))
+      return element.getAttribute("data-wa-cid");
+    if (element.parentElement !== null)
+      return getClickId(element.parentElement);
+    return null;
+  }
+
   if (params.has("micx-wa-disable"))
     localStorage.setItem("MICX_WA_DISABLED", params.get("micx-wa-disable"));
 
@@ -89,7 +97,8 @@
   localStorage.setItem("MICX_ANALYTICS_" + subscription_id, JSON.stringify(lsd));
 
   document.addEventListener("mousedown", (e)=>{
-    ssd.track.push({s:timeofs(), d: 0.2, x: e.clientX, y: e.clientY, k: true});
+    let cid = getClickId(e.target);
+    ssd.track.push({s:timeofs(), d: 0.2, x: e.clientX, y: e.clientY, k: true, cid: cid});
     ssd.mouse_clicks++;
   });
 

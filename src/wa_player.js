@@ -52,7 +52,14 @@
         clickDiv.style.left = frame.x + "px";
         window.setTimeout(() => {
           clickDiv.style.display = "none";
-          let elem = document.elementFromPoint(frame.x, frame.y);
+
+          let elem = null;
+          if(frame.cid !== null) {
+            elem = document.querySelector(["[data-wa-cid='"+ frame.cid +"'"])
+          } else {
+            elem = document.elementFromPoint(frame.x, frame.y);
+          }
+
           if (elem === null)
             return;
           if ( isRealLink(elem) )
