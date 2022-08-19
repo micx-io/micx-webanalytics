@@ -71,7 +71,7 @@ class MicxCookieConsentElement extends HTMLElement {
           this.hideConsent();
         }
 
-      }, 5000);
+      }, 2000);
   }
 }
 
