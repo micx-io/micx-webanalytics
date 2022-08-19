@@ -70,7 +70,6 @@
       } else {
         $("html, body")
           .animate({scrollTop: frame.y}, frame.d * 1000)
-          .animate({zoom: frame.z}, frame.d * 1000)
           .animate({scrollLeft: frame.x}, frame.d * 1000);
       }
 
