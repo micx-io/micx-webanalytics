@@ -30,6 +30,14 @@
     return trim((+new Date() - startTime) / 1000);
   }
 
+  let isRealLink = (element) => {
+      if (element instanceof HTMLElement && element.hasAttribute("href") && ! element.getAttribute("href").startsWith("javascript:"))
+        return true;
+      if (element.parentElement !== null)
+        return isRealLink(element.parentElement);
+      return false;
+  }
+
   let play = (track) => {
     console.log ("play track:", track, track.length);
 
@@ -47,8 +55,7 @@
           let elem = document.elementFromPoint(frame.x, frame.y);
           if (elem === null)
             return;
-          if ( (elem.hasAttribute("href") && elem.getAttribute("href") !== "") ||
-                (elem.parentElement !== null && elem.parentElement.hasAttribute("href") && elem.parentElement.getAttribute("href") !== "") )
+          if ( isRealLink(elem) )
             return;
           elem.focus();
           elem.click();
