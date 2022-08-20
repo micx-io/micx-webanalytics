@@ -4,6 +4,5 @@
 {subject}Daily website report for {=subscription_id}: {=total}{/subject}
 
 
-
 {=data | raw}
 
