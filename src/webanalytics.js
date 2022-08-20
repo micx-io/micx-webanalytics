@@ -34,6 +34,8 @@
     return null;
   }
 
+
+
   if (params.has("micx-wa-disable"))
     localStorage.setItem("MICX_WA_DISABLED", params.get("micx-wa-disable"));
 

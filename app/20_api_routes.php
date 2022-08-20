@@ -137,9 +137,19 @@ AppLoader::extend(function (BraceApp $app) {
 
         }
 
-
         $response = new JsonResponse(["ok"]);
         return $response;
+    });
+
+    $app->router->on("POST@/v1/webanalytics/log", function(T_Subscription $subscription, string $body, ServerRequest $request) {
+        $logfile = phore_file(DATA_PATH . "/" . $subscription->subscription_id . ".log");
+        $data = phore_json_decode($body);
+        $data["time"] = date("Y-m-d H:i:s");
+        $data["ts"] = time();
+        $data["ip"] = anonymize_host_ip($request->getHeader("X-Real-IP")[0] ?? "unset x-real-ip");
+        $data["host"] = anonymize_host_ip(gethostbyaddr($request->getHeader("X-Real-IP")[0] ?? "127.0.0.1"));
+        $logfile->append_content(phore_json_encode($data) . "\n");
+        return ["ok"];
     });
 
 

@@ -81,6 +81,20 @@ customElements.define("micx-cookie-consent", MicxCookieConsentElement);
   let endpoint_url="%%ENDPOINT_URL%%";
   let subscription_id = "%%SUBSCRIPTION_ID%%";
 
+  let logUrl = endpoint_url + `log?subscription_id=${subscription_id}`;
+  fetch(logUrl, {
+    method: "POST",
+    cache: "no-cache",
+    headers: {'Content-Type': "application/json"},
+    body: JSON.stringify({
+      href: window.location.href,
+      user_agent: window.navigator.userAgent,
+      language: window.navigator.language,
+      screen: screen.width + "x" + screen.height,
+      window:  window.innerWidth + "x"+ window.innerHeight,
+    })
+  })
+
     let params = new URLSearchParams(window.location.search);
     if (params.has("micx-wa-session") || sessionStorage.getItem("MICX_WA_SESSION") !== null) {
         if (typeof jQuery === "undefined") {

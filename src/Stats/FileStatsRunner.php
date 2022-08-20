@@ -56,12 +56,17 @@ class FileStatsRunner
             $clientConfig = $subscription->getClientPrivateConfig(null, T_Analytics::class);
             assert($clientConfig instanceof T_Analytics);
 
+
+
             $basicReport = "";
 
-            $logfile = phore_file(DATA_PATH . "/{$subscription->subscription_id}.track");
+            $logFile = phore_file(DATA_PATH . "/{$subscription->subscription_id}.log");
+            $basicReport = (new LogReader())->read($logFile);
+
+            $traceFile = phore_file(DATA_PATH . "/{$subscription->subscription_id}.track");
             $report = null;
-            if ($logfile->exists()) {
-                $report = $this->run($logfile, $fromTs, $tillTs);
+            if ($traceFile->exists()) {
+                $report = $this->run($traceFile, $fromTs, $tillTs);
             }
 
 
@@ -70,7 +75,7 @@ class FileStatsRunner
             $mailer->send($template, [
                 "email" => $clientConfig->report_email,
                 "subscription_id" => $subscription->subscription_id,
-                "data" => $basicReport ."\n\n" . $report?->getReport(),
+                "data" =>  $report?->getReport() ."\n\n". $basicReport ,
                 "total" => count ($report?->visitorMap ?? [])
             ]);
 
