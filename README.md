@@ -12,7 +12,6 @@ Website Statistics
 
 ```
 data-ws-cid         Unique Click ID for click recording
-
 ```
 
 
