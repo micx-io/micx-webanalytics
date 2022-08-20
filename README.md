@@ -15,6 +15,7 @@ data-ws-cid         Unique Click ID for click recording
 
 ```
 
+
 ## Cookie Consent Template
 
 
