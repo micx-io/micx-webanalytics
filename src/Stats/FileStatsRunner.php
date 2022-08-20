@@ -2,7 +2,9 @@
 
 namespace Micx\FormMailer\Stats;
 
-use Micx\FormMailer\Config\Config;
+use Lack\Subscription\SubscriptionManagerInterface;
+use Micx\FormMailer\Config\T_Analytics;
+use Micx\FormMailer\Config\TAnalytics;
 use Phore\FileSystem\PhoreFile;
 use Phore\Mail\PhoreMailer;
 
@@ -10,7 +12,7 @@ class FileStatsRunner
 {
 
     public function __construct (
-
+        public SubscriptionManagerInterface $subscriptionManager
     ){}
 
 
@@ -49,14 +51,14 @@ class FileStatsRunner
         $mailer->setSmtpDirectConnect("micx.io");
         $template = file_get_contents(__DIR__ . "/../mail.txt");
 
-        foreach (phore_dir(CONFIG_PATH)->genWalk("*.yml") as $configFile) {
-            $subscriptionId = $configFile->getFilename();
-            $config = phore_hydrate($configFile->assertFile()->get_yaml(), Config::class);
-
+        foreach ($this->subscriptionManager->getSubscriptionsByClientId() as $curSubscriptionId) {
+            $subscription = $this->subscriptionManager->getSubscriptionById($curSubscriptionId, true);
+            $clientConfig = $subscription->getClientPrivateConfig(null, T_Analytics::class);
+            assert($clientConfig instanceof T_Analytics);
 
             $basicReport = "";
 
-            $logfile = phore_file(DATA_PATH . "/$subscriptionId.track");
+            $logfile = phore_file(DATA_PATH . "/{$subscription->subscription_id}.track");
             $report = null;
             if ($logfile->exists()) {
                 $report = $this->run($logfile, $fromTs, $tillTs);
@@ -66,8 +68,8 @@ class FileStatsRunner
 
 
             $mailer->send($template, [
-                "email" => $config->report_email,
-                "subscription_id" => $subscriptionId,
+                "email" => $clientConfig->report_email,
+                "subscription_id" => $subscription->subscription_id,
                 "data" => $basicReport ."\n\n" . $report?->getReport(),
                 "total" => count ($report?->visitorMap ?? [])
             ]);

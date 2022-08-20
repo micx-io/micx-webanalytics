@@ -4,13 +4,14 @@ namespace App;
 
 use Brace\Core\AppLoader;
 use Brace\Core\BraceApp;
+use Lack\Subscription\SubscriptionManagerInterface;
 use Micx\FormMailer\Stats\FileStatsRunner;
 
 AppLoader::extend(function (BraceApp $app) {
 
 
-    $app->command->addCommand("send", function(array $argv) {
-        $runner = new FileStatsRunner();
+    $app->command->addCommand("send", function(array $argv, SubscriptionManagerInterface $subscriptionManager) {
+        $runner = new FileStatsRunner($subscriptionManager);
         $runner->runAll($argv[0] ?? 0);
     });
 

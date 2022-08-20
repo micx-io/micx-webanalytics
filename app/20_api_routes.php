@@ -12,12 +12,13 @@ use Lack\OidServer\Base\Ctrl\SignInCtrl;
 use Lack\OidServer\Base\Ctrl\LogoutCtrl;
 use Lack\OidServer\Base\Ctrl\TokenCtrl;
 use Lack\OidServer\Base\Tpl\HtmlTemplate;
+use Lack\Subscription\Type\T_Subscription;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\Response\TextResponse;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequest;
-use Micx\FormMailer\Config\Config;
+use Micx\FormMailer\Config\TAnalytics;
 use Phore\Mail\PhoreMailer;
 use Psr\Http\Message\ServerRequestInterface;
 use function Sodium\add;
@@ -36,12 +37,12 @@ AppLoader::extend(function (BraceApp $app) {
     });
 
 
-    $app->router->on("GET@/v1/webanalytics/wa.js", function (BraceApp $app, string $subscriptionId, Config $config, ServerRequestInterface $request) {
-
+    $app->router->on("GET@/v1/webanalytics/wa.js", function (BraceApp $app, T_Subscription $subscription, ServerRequestInterface $request) {
+        $subscriptionId = addslashes($subscription->subscription_id);
         $origin = $request->getHeader("referer")[0] ?? "";
-        if ( ! origin_match($origin, $config->allow_origins)) {
+        if ( ! origin_match($origin, $subscription->allow_origins)) {
             $origin = addslashes($origin);
-            $subscriptionId = addslashes($subscriptionId);
+
             return $app->responseFactory->createResponseWithBody(
                 "console.log('Webanalytics: Invalid origin $origin for subscriptionId $subscriptionId')",
                 403, ["content-type"=>"text/javascript"]
@@ -82,7 +83,7 @@ AppLoader::extend(function (BraceApp $app) {
     });
 
 
-    $app->router->on("GET@/v1/webanalytics/emit", function (ServerRequest $request, Config $config) {
+    $app->router->on("GET@/v1/webanalytics/emit", function (ServerRequest $request, T_Subscription $subscription) {
         $session_id = $request->getQueryParams()["session_id"] ?? null;
         $session_seq = (int)($request->getQueryParams()["session_seq"] ?? -1);
         $endpoint_key = (string)($request->getQueryParams()["endpoint_key"] ?? "");
@@ -90,7 +91,7 @@ AppLoader::extend(function (BraceApp $app) {
         if ($endpoint_key !== sha1(FE_SECRET . $session_id))
             throw new \InvalidArgumentException("Invalid endpoint key.");
 
-        $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id . ".track");
+        $logfile = phore_file(DATA_PATH . "/" . $subscription->subscription_id . ".track");
 
         $fp = $logfile->fopen("r");
         while ( ! $fp->feof()) {
@@ -106,14 +107,14 @@ AppLoader::extend(function (BraceApp $app) {
         return ["sequence_end" => true];
     });
 
-    $app->router->on("POST@/v1/webanalytics/emit", function(string $body, Config $config, ServerRequest $request) use ($app) {
+    $app->router->on("POST@/v1/webanalytics/emit", function(string $body, T_Subscription $subscription, ServerRequest $request) use ($app) {
         $endpoint_key = (string)($request->getQueryParams()["endpoint_key"] ?? "");
         $data = json_decode($body, true);
 
-        if ($endpoint_key !== sha1($config->subscription_id . $data["session_id"] . FE_SECRET))
+        if ($endpoint_key !== sha1($subscription->subscription_id . $data["session_id"] . FE_SECRET))
             throw new \InvalidArgumentException("Endpoint key invalid");
 
-        $logfile = phore_file(DATA_PATH . "/" . $config->subscription_id . ".track");
+        $logfile = phore_file(DATA_PATH . "/" . $subscription->subscription_id . ".track");
 
         if (is_array($data)) {
             $data["ts"] = time();
@@ -124,9 +125,9 @@ AppLoader::extend(function (BraceApp $app) {
 
 
             // Download
-            if (origin_match($data["href"], $config->allow_origins)) {
+            if (origin_match($data["href"], $subscription->allow_origins)) {
                 $logfile->append_content(json_encode($data) . "\n");
-                $siteConfigFile = getSiteDataStorePath($config->subscription_id, $data["href"], $data["page_id"] ?? "missing");
+                $siteConfigFile = getSiteDataStorePath($subscription->subscription_id, $data["href"], $data["page_id"] ?? "missing");
                 if ( ! $siteConfigFile->exists()) {
                     $siteConfigFile->createPath()->set_contents(
                        phore_http_request($data["href"])->send()->getBody()

@@ -8,6 +8,12 @@ Website Statistics
 {lpurl}?_cpg=<EINFÜGEN>&_keyword={keyword}&_device={device}&_loc={loc_physical_ms}
 ```
 
+## Tags
+
+```
+data-ws-cid         Unique Click ID for click recording
+
+```
 
 ## Cookie Consent Template
 

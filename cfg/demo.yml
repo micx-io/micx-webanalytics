@@ -1,4 +1,0 @@
-subscription_id: demo
-allow_origins:
-  - http://localhost
-report_email: m@tth.es

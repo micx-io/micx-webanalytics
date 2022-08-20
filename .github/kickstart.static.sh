@@ -11,7 +11,7 @@ PROJECT_PATH="$PWD"
 # Ready to use development containers. Just run ./kickstart.sh to start a development
 # environment for this project.
 #
-# Config-File: .kick.yml
+# TAnalytics-File: .kick.yml
 # Website..: https://nfra.infracamp.org/
 # Copyright: Matthias Leuffen <m@tth.es>
 # Released under GNU General Public License <http://www.gnu.org/licenses/gpl-3.0.html>
