@@ -21,7 +21,7 @@ class MicxCookieConsentElement extends HTMLElement {
       let subscription_id = "%%SUBSCRIPTION_ID%%";
 
       let purl = endpoint_url + `wa.js?subscription_id=${subscription_id}&analytics`;
-      console.log("mounting");
+
       let script = document.createElement("script");
       script.setAttribute("src", purl);
       this.appendChild(script);
