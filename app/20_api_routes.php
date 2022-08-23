@@ -18,6 +18,7 @@ use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\Response\TextResponse;
 use Laminas\Diactoros\ResponseFactory;
 use Laminas\Diactoros\ServerRequest;
+use Micx\FormMailer\Config\T_Analytics;
 use Micx\FormMailer\Config\TAnalytics;
 use Phore\Mail\PhoreMailer;
 use Psr\Http\Message\ServerRequestInterface;
@@ -39,6 +40,9 @@ AppLoader::extend(function (BraceApp $app) {
 
     $app->router->on("GET@/v1/webanalytics/wa.js", function (BraceApp $app, T_Subscription $subscription, ServerRequestInterface $request) {
         $subscriptionId = addslashes($subscription->subscription_id);
+        $config = $subscription->getClientPrivateConfig(null, T_Analytics::class);
+        assert ($config instanceof T_Analytics);
+
         $origin = $request->getHeader("referer")[0] ?? "";
         if ( ! origin_match($origin, $subscription->allow_origins)) {
             $origin = addslashes($origin);
@@ -62,13 +66,14 @@ AppLoader::extend(function (BraceApp $app) {
         $rand = phore_random_str(6);
         $endpointKey = sha1($subscriptionId . $rand . FE_SECRET);
         $jsText = str_replace(
-            ["%%ENDPOINT_URL%%", "%%RAND%%", "%%SERVER_DATE%%", "%%SUBSCRIPTION_ID%%", "%%ENDPOINT_KEY%%"],
+            ["%%ENDPOINT_URL%%", "%%RAND%%", "%%SERVER_DATE%%", "%%SUBSCRIPTION_ID%%", "%%ENDPOINT_KEY%%", "%%CONFIG%%"],
             [
                 "//" . $app->request->getUri()->getHost() . "/v1/webanalytics/",
                 $rand,
                 gmdate("Y-m-d H:i:s"),
                 $subscriptionId,
-                $endpointKey
+                $endpointKey,
+                json_encode(["autostart" => $config->autostart])
             ],
             $jsText
         );

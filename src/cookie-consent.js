@@ -10,19 +10,26 @@
 class MicxCookieConsentElement extends HTMLElement {
     constructor() {
         super();
+        this.config = %%CONFIG%%;
+        this.mounted = false;
     }
 
     mountAnalytics(withTracking) {
+      if (this.mounted === true)
+        return;
       let endpoint_url="%%ENDPOINT_URL%%";
       let subscription_id = "%%SUBSCRIPTION_ID%%";
-      let purl = endpoint_url + `wa.js?subscription_id=${subscription_id}&analytics`;
 
+      let purl = endpoint_url + `wa.js?subscription_id=${subscription_id}&analytics`;
+      console.log("mounting");
       let script = document.createElement("script");
       script.setAttribute("src", purl);
       this.appendChild(script);
 
       let tpl = this.querySelector("template");
       this.appendChild(tpl.content);
+
+      this.mounted = true;
     }
 
     openConsent() {
@@ -34,6 +41,13 @@ class MicxCookieConsentElement extends HTMLElement {
     }
 
     connectedCallback() {
+
+      if (this.config.autostart === true) {
+        window.setTimeout(() => {
+
+          this.mountAnalytics(true);
+        }, 50);
+      }
       window.setTimeout(()=> {
         const locStorName = "MICX-COOKIE-CONSENT";
         const askAgain = 86400 * 1000;
@@ -82,27 +96,29 @@ customElements.define("micx-cookie-consent", MicxCookieConsentElement);
   let subscription_id = "%%SUBSCRIPTION_ID%%";
 
   let logUrl = endpoint_url + `log?subscription_id=${subscription_id}`;
-  fetch(logUrl, {
-    method: "POST",
-    cache: "no-cache",
-    headers: {'Content-Type': "application/json"},
-    body: JSON.stringify({
-      href: window.location.href,
-      user_agent: window.navigator.userAgent,
-      language: window.navigator.language,
-      screen: screen.width + "x" + screen.height,
-      window:  window.innerWidth + "x"+ window.innerHeight,
+  let params = new URLSearchParams(window.location.search);
+  if ( ! params.has("micx-wa-session") &&  sessionStorage.getItem("MICX_WA_SESSION") === null) {
+    fetch(logUrl, {
+      method: "POST",
+      cache: "no-cache",
+      headers: {'Content-Type': "application/json"},
+      body: JSON.stringify({
+        href: window.location.href,
+        user_agent: window.navigator.userAgent,
+        language: window.navigator.language,
+        screen: screen.width + "x" + screen.height,
+        window:  window.innerWidth + "x"+ window.innerHeight,
+      })
     })
-  })
+  }
 
-    let params = new URLSearchParams(window.location.search);
-    if (params.has("micx-wa-session") || sessionStorage.getItem("MICX_WA_SESSION") !== null) {
-        if (typeof jQuery === "undefined") {
-            document.writeln(`<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>`);
-        }
-        let purl = endpoint_url + `wa.js?subscription_id=${subscription_id}&player`;
-        document.writeln(`<script src="${purl}"></script>`);
-    }
+  if (params.has("micx-wa-session") || sessionStorage.getItem("MICX_WA_SESSION") !== null) {
+      if (typeof jQuery === "undefined") {
+          document.writeln(`<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>`);
+      }
+      let purl = endpoint_url + `wa.js?subscription_id=${subscription_id}&player`;
+      document.writeln(`<script src="${purl}"></script>`);
+  }
 
 })();
 
