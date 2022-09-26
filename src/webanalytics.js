@@ -35,7 +35,6 @@
   }
 
 
-
   if (params.has("micx-wa-disable"))
     localStorage.setItem("MICX_WA_DISABLED", params.get("micx-wa-disable"));
 
@@ -140,7 +139,7 @@
   window.setTimeout(()=> {
     for (let el of document.querySelectorAll("*[micx-wa-conversion]")) {
       el.addEventListener("click", (e) => {
-        let cid = e.target.getAttribute("micx-wa-conversion");
+        let cid = el.getAttribute("micx-wa-conversion");
         ssd.conversions[cid] = timeofs();
       })
     }
