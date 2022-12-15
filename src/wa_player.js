@@ -136,8 +136,8 @@
       console.log(window.innerHeight, window.innerWidth);
       qLoadSession()
     });
-    console.log("Player", document.readyState);
-    if (document.readyState === "complete")
+    //console.log("Player", document.readyState);
+    if (document.readyState === "complete" || document.readyState === "interactive")
       qLoadSession();
   }
 
