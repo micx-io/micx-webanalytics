@@ -136,6 +136,8 @@
       console.log(window.innerHeight, window.innerWidth);
       qLoadSession()
     });
+    if (document.readyState === "complete")
+      qLoadSession();
   }
 
 
