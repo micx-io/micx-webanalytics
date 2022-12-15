@@ -113,18 +113,16 @@ customElements.define("micx-cookie-consent", MicxCookieConsentElement);
   }
 
   if (params.has("micx-wa-session") || sessionStorage.getItem("MICX_WA_SESSION") !== null) {
-      let div = document.createElement("div");
-      let html = "";
-      if (typeof jQuery === "undefined") {
-          html +=`<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>`;
-      }
+
       let purl = endpoint_url + `wa.js?subscription_id=${subscription_id}&player`;
       let script = document.createElement("script");
       script.setAttribute("src", purl);
       document.body.append(script);
-      //html += `<script src="${purl}"></script>`;
-      div.innerHTML = html;
-      document.body.append(div);
+      if (typeof $ === "undefined") {
+        script = document.createElement("script");
+        script.setAttribute("src", "https://code.jquery.com/jquery-3.6.0.min.js");
+        document.body.append(script);
+      }
   }
 
 })();
