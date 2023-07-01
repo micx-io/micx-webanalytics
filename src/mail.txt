@@ -1,5 +1,5 @@
 {mail to=email name=email}
-{mail from="sender@address.de" name="Micx Webanalytics"}
+{mail from="ro-reply@ws.micx.io" name="Micx Webanalytics"}
 {mail charset="utf-8"}
 {subject}Daily website report for {=subscription_id}: {=total}{/subject}
 
