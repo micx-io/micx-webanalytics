@@ -9,4 +9,3 @@ RUN ["bash", "-c",  "chown -R user /opt"]
 RUN ["/kickstart/run/entrypoint.sh", "build"]
 
 ENTRYPOINT ["/kickstart/run/entrypoint.sh", "standalone"]
-
