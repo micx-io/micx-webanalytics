@@ -1,5 +1,5 @@
 FROM ghcr.io/nfra-project/kickstart-flavor-php:8.1
-ENV DEV_CONTAINER_NAME="micx-formmailer"
+ENV DEV_CONTAINER_NAME="micx-analytics"
 ENV CONFIG_PATH="/config"
 ENV DATA_PATH="/data"
 
